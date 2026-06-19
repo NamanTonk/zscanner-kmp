@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="zscanner_title">Scan QR code</string>
+    <string name="zscanner_permission_title">Camera permission required</string>
+    <string name="zscanner_permission_body">Allow camera access to scan QR codes.</string>
+    <string name="zscanner_permission_allow">Allow camera</string>
+    <string name="zscanner_permission_denied">Camera access denied</string>
+    <string name="zscanner_permission_denied_always">Camera access blocked. Open Settings to enable it.</string>
+    <string name="zscanner_open_settings">Open Settings</string>
+</resources>

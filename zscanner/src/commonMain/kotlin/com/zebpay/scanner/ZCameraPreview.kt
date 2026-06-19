@@ -1,0 +1,11 @@
+package com.zebpay.scanner
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
+@Composable
+internal expect fun ZCameraPreview(
+    controller: ZScannerController,
+    modifier: Modifier,
+    onBarcodeDetected: (Barcode) -> Unit,
+)

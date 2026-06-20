@@ -24,6 +24,7 @@ import com.zebpay.scanner.ZScannerScreen
 import com.zebpay.scanner.ZScannerFrameRatio
 import com.zebpay.scanner.permission.rememberMokoCameraPermissionController
 import com.zebpay.scanner.rememberZScannerController
+import com.zebpay.scanner.ui.defaults.ScanFrameOverlay
 
 @Composable
 @Preview
@@ -63,6 +64,9 @@ fun App() {
                     },
                     onClose = {
                         showScanner = false
+                    },
+                    camera = {
+                           ScanFrameOverlay()
                     },
                     scannerController = rememberZScannerController(
                         cameraMode = ZScannerCameraMode.FrameOnly,

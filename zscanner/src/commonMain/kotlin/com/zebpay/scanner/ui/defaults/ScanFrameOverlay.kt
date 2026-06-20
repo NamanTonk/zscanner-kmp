@@ -1,8 +1,11 @@
 package com.zebpay.scanner.ui.defaults
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -15,12 +18,15 @@ import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zebpay.scanner.ZScannerCameraMode
 import com.zebpay.scanner.ZScannerCameraScope
+import com.zebpay.scanner.ZScannerFrameRatio
 import com.zebpay.scanner.frame.ScanFrameSpec
 import com.zebpay.scanner.frame.effectiveCornerRadiusPx
+import com.zebpay.scanner.rememberZScannerController
 
 @Composable
 fun ZScannerCameraScope.ScanFrameOverlay(
@@ -104,4 +110,25 @@ internal fun DrawScope.drawRoundedFrameScrim(
         fillType = PathFillType.EvenOdd
     }
     drawPath(scrimPath, scrimColor)
+}
+
+@Preview
+@Composable
+fun ScanFrameOverlayPreview() {
+    val controller = rememberZScannerController(
+        frameColor = Color(0xFF4CAF50),
+        frameRatio = ZScannerFrameRatio.Ratio_1_1
+    )
+    val scope = remember(controller) {
+        ZScannerCameraScope(
+            controller = controller,
+            cameraMode = ZScannerCameraMode.FullScreen,
+            frameSpec = ScanFrameSpec.Default,
+            frameBounds = Rect(100f, 150f, 500f, 550f),
+            onScanFromGalleryCallback = {}
+        )
+    }
+    Box(modifier = Modifier.size(300.dp, 400.dp)) {
+        scope.ScanFrameOverlay()
+    }
 }

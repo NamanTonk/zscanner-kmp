@@ -25,6 +25,10 @@ import com.zebpay.scanner.ZScannerFrameRatio
 import com.zebpay.scanner.permission.rememberMokoCameraPermissionController
 import com.zebpay.scanner.rememberZScannerController
 import com.zebpay.scanner.ui.defaults.ScanFrameOverlay
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.FlashOff
+import androidx.compose.material.icons.filled.Image
 
 @Composable
 @Preview
@@ -67,6 +71,22 @@ fun App() {
                     },
                     camera = {
                            ScanFrameOverlay()
+
+                        if (torchAvailable) {
+                            IconButton(
+                                onClick = ::toggleTorch,
+                                modifier = Modifier.align(Alignment.BottomStart).padding(24.dp)
+                            ) {
+                                Icon(if (torchEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff, null)
+                            }
+                        }
+                        // Render a gallery button
+                        IconButton(
+                            onClick = { onScanFromGallery() }, // Call the callback
+                            modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)
+                        ) {
+                            Icon(Icons.Default.Image, contentDescription = "Scan from Gallery")
+                        }
                     },
                     scannerController = rememberZScannerController(
                         cameraMode = ZScannerCameraMode.FrameOnly,

@@ -335,40 +335,6 @@ fun ZScannerScreenLayout(
         onClose = {
             onIntent(AppIntent.StopScanning)
         },
-        camera = {
-            Box(modifier = Modifier.fillMaxSize()) {
-                ScanFrameOverlay()
-                if (torchAvailable) {
-                    IconButton(
-                        onClick = ::toggleTorch,
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(24.dp)
-                            .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(50))
-                    ) {
-                        Icon(
-                            imageVector = if (torchEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff,
-                            contentDescription = "Toggle Flash",
-                            tint = Color.Black
-                        )
-                    }
-                }
-                // Render a gallery button
-                IconButton(
-                    onClick = { onScanFromGallery() },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(24.dp)
-                        .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(50))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = "Scan from Gallery",
-                        tint = Color.Black
-                    )
-                }
-            }
-        },
         scannerController = rememberZScannerController(
             cameraMode = ZScannerCameraMode.FrameOnly,
             frameRatio = state.selectedRatio,

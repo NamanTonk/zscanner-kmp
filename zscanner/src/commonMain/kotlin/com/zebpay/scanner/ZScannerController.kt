@@ -13,13 +13,17 @@ fun rememberZScannerController(
     cameraMode: ZScannerCameraMode = ZScannerCameraMode.FullScreen,
     frameRatio: ZScannerFrameRatio = ZScannerFrameRatio.Ratio_1_1,
     frameColor: Color = Color(0xFF4CAF50),
+    showTorchButton: Boolean = true,
+    showGalleryButton: Boolean = true,
 ): ZScannerController {
-    val controller = remember(formats, cameraMode, frameRatio, frameColor) {
+    val controller = remember(formats, cameraMode, frameRatio, frameColor, showTorchButton, showGalleryButton) {
         ZScannerController(
             formats = formats,
             cameraMode = cameraMode,
             frameRatio = frameRatio,
-            frameColor = frameColor
+            frameColor = frameColor,
+            showTorchButton = showTorchButton,
+            showGalleryButton = showGalleryButton
         )
     }
     return controller
@@ -30,6 +34,8 @@ class ZScannerController internal constructor(
     val cameraMode: ZScannerCameraMode,
     val frameRatio: ZScannerFrameRatio,
     val frameColor: Color,
+    val showTorchButton: Boolean,
+    val showGalleryButton: Boolean,
 ) {
     internal var platformHandle: PlatformScannerHandle? = null
 

@@ -352,14 +352,18 @@ fun App() {
 fun parseHexColor(hex: String): Color? {
     val cleanHex = hex.trim().removePrefix("#")
     return try {
-        if (cleanHex.length == 6) {
-            val colorLong = ("FF$cleanHex").toLong(16)
-            Color(colorLong)
-        } else if (cleanHex.length == 8) {
-            val colorLong = cleanHex.toLong(16)
-            Color(colorLong)
-        } else {
-            null
+        when (cleanHex.length) {
+            6 -> {
+                val colorLong = ("FF$cleanHex").toLong(16)
+                Color(colorLong)
+            }
+            8 -> {
+                val colorLong = cleanHex.toLong(16)
+                Color(colorLong)
+            }
+            else -> {
+                null
+            }
         }
     } catch (e: Exception) {
         null

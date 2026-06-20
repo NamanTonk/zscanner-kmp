@@ -104,7 +104,14 @@ internal class ZScannerCaptureSession(
         }
     }
 
-    override fun isTorchAvailable(): Boolean = device?.hasTorch == true
+    override fun isTorchAvailable(): Boolean {
+        val cam = device ?: AVCaptureDevice.defaultDeviceWithDeviceType(
+            AVCaptureDeviceTypeBuiltInWideAngleCamera,
+            AVMediaTypeVideo,
+            AVCaptureDevicePositionBack,
+        )
+        return cam?.hasTorch == true
+    }
 
     override fun pause() = stop()
 

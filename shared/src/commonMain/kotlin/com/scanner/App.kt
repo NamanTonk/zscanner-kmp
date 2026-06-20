@@ -127,7 +127,7 @@ fun App() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .safeContentPadding()
+                        .windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Vertical))
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center

@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zebpay.scanner.BarcodeResult
 import com.zebpay.scanner.ZScannerCameraMode
-import com.zebpay.scanner.ZScannerController
 import com.zebpay.scanner.ZScannerScreen
 import com.zebpay.scanner.ZScannerFrameRatio
 import com.zebpay.scanner.permission.rememberMokoCameraPermissionController

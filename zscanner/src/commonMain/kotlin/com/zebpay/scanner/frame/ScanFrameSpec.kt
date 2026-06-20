@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zebpay.scanner.ZScannerFrameRatio
 
 data class ScanFrameSpec(
     /** Frame width as a fraction of the container width (0–1). */
@@ -36,23 +37,26 @@ data class ScanFrameSpec(
 @Composable
 fun rememberScanFrameBounds(
     spec: ScanFrameSpec = ScanFrameSpec.Default,
+    frameRatio: ZScannerFrameRatio = ZScannerFrameRatio.Ratio_1_1,
     containerWidthPx: Float,
     containerHeightPx: Float,
 ): Rect {
     val density = LocalDensity.current
-    return remember(spec, containerWidthPx, containerHeightPx, density) {
-        if (spec.widthFraction == spec.heightFraction && spec.verticalCenterFraction == 0.5f) {
-            val side = minOf(containerWidthPx, containerHeightPx) * spec.widthFraction
-            val left = (containerWidthPx - side) / 2f
-            val top = (containerHeightPx - side) / 2f
-            Rect(left, top, left + side, top + side)
-        } else {
-            val frameWidth = containerWidthPx * spec.widthFraction.coerceIn(0.1f, 1f)
-            val frameHeight = containerHeightPx * spec.heightFraction.coerceIn(0.1f, 1f)
-            val left = (containerWidthPx - frameWidth) / 2f
-            val top = (containerHeightPx - frameHeight) * spec.verticalCenterFraction.coerceIn(0f, 1f)
-            Rect(left, top, left + frameWidth, top + frameHeight)
+    return remember(spec, frameRatio, containerWidthPx, containerHeightPx, density) {
+        val maxAllowedWidth = containerWidthPx * spec.widthFraction.coerceIn(0.1f, 1f)
+        val maxAllowedHeight = containerHeightPx * spec.heightFraction.coerceIn(0.1f, 1f)
+
+        val ratio = frameRatio.ratio
+        var frameWidth = maxAllowedWidth
+        var frameHeight = frameWidth / ratio
+        if (frameHeight > maxAllowedHeight) {
+            frameHeight = maxAllowedHeight
+            frameWidth = frameHeight * ratio
         }
+
+        val left = (containerWidthPx - frameWidth) / 2f
+        val top = (containerHeightPx - frameHeight) * spec.verticalCenterFraction.coerceIn(0f, 1f)
+        Rect(left, top, left + frameWidth, top + frameHeight)
     }
 }
 

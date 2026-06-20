@@ -5,13 +5,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+
 @Composable
 fun rememberZScannerController(
     formats: BarcodeFormat = BarcodeFormat.QR_CODE,
     cameraMode: ZScannerCameraMode = ZScannerCameraMode.FullScreen,
+    frameRatio: ZScannerFrameRatio = ZScannerFrameRatio.Ratio_1_1,
+    frameColor: Color = Color(0xFF4CAF50),
 ): ZScannerController {
-    val controller = remember(formats, cameraMode) {
-        ZScannerController(formats = formats, cameraMode = cameraMode)
+    val controller = remember(formats, cameraMode, frameRatio, frameColor) {
+        ZScannerController(
+            formats = formats,
+            cameraMode = cameraMode,
+            frameRatio = frameRatio,
+            frameColor = frameColor
+        )
     }
     return controller
 }
@@ -19,6 +28,8 @@ fun rememberZScannerController(
 class ZScannerController internal constructor(
     val formats: BarcodeFormat,
     val cameraMode: ZScannerCameraMode,
+    val frameRatio: ZScannerFrameRatio,
+    val frameColor: Color,
 ) {
     internal var platformHandle: PlatformScannerHandle? = null
 

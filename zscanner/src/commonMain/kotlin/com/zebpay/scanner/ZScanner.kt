@@ -82,6 +82,7 @@ internal fun ZScannerCameraHost(
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val frameBounds = rememberScanFrameBounds(
             spec = frameSpec,
+            frameRatio = controller.frameRatio,
             containerWidthPx = constraints.maxWidth.toFloat(),
             containerHeightPx = constraints.maxHeight.toFloat(),
         )

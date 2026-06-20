@@ -2,6 +2,8 @@ package com.scanner
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -19,6 +21,7 @@ import com.zebpay.scanner.BarcodeResult
 import com.zebpay.scanner.ZScannerCameraMode
 import com.zebpay.scanner.ZScannerController
 import com.zebpay.scanner.ZScannerScreen
+import com.zebpay.scanner.ZScannerFrameRatio
 import com.zebpay.scanner.permission.rememberMokoCameraPermissionController
 import com.zebpay.scanner.rememberZScannerController
 
@@ -30,6 +33,8 @@ fun App() {
         var showScanner by remember { mutableStateOf(false) }
         var scanResultText by remember { mutableStateOf("") }
         var scanStatusText by remember { mutableStateOf("No active scans") }
+        var selectedRatio by remember { mutableStateOf<ZScannerFrameRatio>(ZScannerFrameRatio.Ratio_1_1) }
+        var selectedColor by remember { mutableStateOf(Color(0xFF4CAF50)) }
 
         Box(
             modifier = Modifier
@@ -59,7 +64,11 @@ fun App() {
                     onClose = {
                         showScanner = false
                     },
-                    scannerController = rememberZScannerController(cameraMode = ZScannerCameraMode.FrameOnly),
+                    scannerController = rememberZScannerController(
+                        cameraMode = ZScannerCameraMode.FrameOnly,
+                        frameRatio = selectedRatio,
+                        frameColor = selectedColor
+                    ),
                     permissionController = permissionController,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -149,6 +158,173 @@ fun App() {
                         }
                     }
 
+                    // Frame Ratio Selection
+                    Text(
+                        text = "Frame Aspect Ratio",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    
+                    var customRatioText by remember { mutableStateOf("1.5") }
+                    var isCustomRatioSelected by remember { mutableStateOf(false) }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(bottom = 8.dp)
+                    ) {
+                        val presets = listOf(
+                            ZScannerFrameRatio.Ratio_1_1 to "1:1",
+                            ZScannerFrameRatio.Ratio_1_2 to "1:2",
+                            ZScannerFrameRatio.Ratio_2_1 to "2:1"
+                        )
+                        presets.forEach { (preset, label) ->
+                            val isSelected = !isCustomRatioSelected && selectedRatio == preset
+                            OutlinedButton(
+                                onClick = {
+                                    isCustomRatioSelected = false
+                                    selectedRatio = preset
+                                },
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                    contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                                )
+                            ) {
+                                Text(label)
+                            }
+                        }
+                        
+                        OutlinedButton(
+                            onClick = {
+                                isCustomRatioSelected = true
+                                val parsed = customRatioText.toFloatOrNull() ?: 1.0f
+                                selectedRatio = ZScannerFrameRatio.Custom(parsed)
+                            },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = if (isCustomRatioSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                contentColor = if (isCustomRatioSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                if (isCustomRatioSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                            )
+                        ) {
+                            Text("Custom")
+                        }
+                    }
+
+                    if (isCustomRatioSelected) {
+                        OutlinedTextField(
+                            value = customRatioText,
+                            onValueChange = { newValue ->
+                                customRatioText = newValue
+                                val parsed = newValue.toFloatOrNull()
+                                if (parsed != null && parsed > 0.1f) {
+                                    selectedRatio = ZScannerFrameRatio.Custom(parsed)
+                                }
+                            },
+                            label = { Text("Enter Ratio (e.g. 1.5)") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .padding(bottom = 16.dp)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    // Frame Color Selection
+                    Text(
+                        text = "Frame Border Color",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    
+                    var customColorText by remember { mutableStateOf("#9C27B0") }
+                    var isCustomColorSelected by remember { mutableStateOf(false) }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(bottom = 8.dp)
+                    ) {
+                        val colorPresets = listOf(
+                            Color(0xFFEF5350) to "Red",
+                            Color(0xFF4CAF50) to "Green",
+                            Color(0xFFFF9800) to "Orange"
+                        )
+                        colorPresets.forEach { (colorVal, name) ->
+                            val isSelected = !isCustomColorSelected && selectedColor == colorVal
+                            OutlinedButton(
+                                onClick = {
+                                    isCustomColorSelected = false
+                                    selectedColor = colorVal
+                                },
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = if (isSelected) colorVal else Color.Transparent,
+                                    contentColor = if (isSelected) Color.White else colorVal
+                                ),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (isSelected) colorVal else colorVal.copy(alpha = 0.5f)
+                                )
+                            ) {
+                                Text(name)
+                            }
+                        }
+                        
+                        val parsedCustomColor = parseHexColor(customColorText) ?: Color.Gray
+                        val isSelected = isCustomColorSelected
+                        OutlinedButton(
+                            onClick = {
+                                isCustomColorSelected = true
+                                selectedColor = parsedCustomColor
+                            },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = if (isSelected) parsedCustomColor else Color.Transparent,
+                                contentColor = if (isSelected) Color.White else parsedCustomColor
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                if (isSelected) parsedCustomColor else parsedCustomColor.copy(alpha = 0.5f)
+                            )
+                        ) {
+                            Text("Custom")
+                        }
+                    }
+
+                    if (isCustomColorSelected) {
+                        OutlinedTextField(
+                            value = customColorText,
+                            onValueChange = { newValue ->
+                                customColorText = newValue
+                                val parsed = parseHexColor(newValue)
+                                if (parsed != null) {
+                                    selectedColor = parsed
+                                }
+                            },
+                            label = { Text("Enter Hex Color (e.g. #9C27B0)") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .padding(bottom = 32.dp)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+
                     // Scan Trigger Button
                     Button(
                         onClick = { showScanner = true },
@@ -170,5 +346,22 @@ fun App() {
                 }
             }
         }
+    }
+}
+
+fun parseHexColor(hex: String): Color? {
+    val cleanHex = hex.trim().removePrefix("#")
+    return try {
+        if (cleanHex.length == 6) {
+            val colorLong = ("FF$cleanHex").toLong(16)
+            Color(colorLong)
+        } else if (cleanHex.length == 8) {
+            val colorLong = cleanHex.toLong(16)
+            Color(colorLong)
+        } else {
+            null
+        }
+    } catch (e: Exception) {
+        null
     }
 }

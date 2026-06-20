@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 @Composable
 fun rememberZScannerController(
-    formats: Set<BarcodeFormat> = setOf(BarcodeFormat.QR_CODE),
+    formats: BarcodeFormat = BarcodeFormat.QR_CODE,
     cameraMode: ZScannerCameraMode = ZScannerCameraMode.FullScreen,
 ): ZScannerController {
     val controller = remember(formats, cameraMode) {
@@ -17,7 +17,7 @@ fun rememberZScannerController(
 }
 
 class ZScannerController internal constructor(
-    val formats: Set<BarcodeFormat>,
+    val formats: BarcodeFormat,
     val cameraMode: ZScannerCameraMode,
 ) {
     internal var platformHandle: PlatformScannerHandle? = null

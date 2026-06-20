@@ -31,8 +31,6 @@ fun ZScannerScreen(
     onClose: () -> Unit,
     permissionController: ZScannerPermissionController,
     modifier: Modifier = Modifier,
-    formats: Set<BarcodeFormat> = setOf(BarcodeFormat.QR_CODE),
-    cameraMode: ZScannerCameraMode = ZScannerCameraMode.FullScreen,
     frameSpec: ScanFrameSpec = ScanFrameSpec.Default,
     onPermissionEvent: (ZScannerPermissionEvent) -> Unit = {},
     chrome: @Composable (content: @Composable () -> Unit) -> Unit = { content ->
@@ -40,13 +38,14 @@ fun ZScannerScreen(
     },
     permission: @Composable ZScannerPermissionScope.() -> Unit = { DefaultPermissionContent() },
     camera: @Composable ZScannerCameraScope.() -> Unit = { DefaultCameraContent() },
-    scannerController: ZScannerController? = null,
+    scannerController: ZScannerController = rememberZScannerController(
+        formats = BarcodeFormat.QR_CODE,
+        cameraMode = ZScannerCameraMode.FullScreen
+    ),
     onScanFromGallery: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     var permissionState by remember { mutableStateOf(ZCameraPermissionState.NotDetermined) }
-    val defaultController = rememberZScannerController(formats = formats, cameraMode = cameraMode)
-    val activeController = scannerController ?: defaultController
 
     suspend fun refreshPermission() {
         permissionState = permissionController.currentState()
@@ -68,7 +67,7 @@ fun ZScannerScreen(
         when (permissionState) {
             ZCameraPermissionState.Granted -> {
                 ZScanner(
-                    controller = activeController,
+                    controller = scannerController,
                     onResult = onResult,
                     modifier = modifier.fillMaxSize(),
                     frameSpec = frameSpec,
@@ -85,9 +84,18 @@ fun ZScannerScreen(
                             val newState = permissionController.requestPermission()
                             permissionState = newState
                             when (newState) {
-                                ZCameraPermissionState.Granted -> onPermissionEvent(ZScannerPermissionEvent.Granted)
-                                ZCameraPermissionState.Denied -> onPermissionEvent(ZScannerPermissionEvent.Denied)
-                                ZCameraPermissionState.DeniedAlways -> onPermissionEvent(ZScannerPermissionEvent.DeniedAlways)
+                                ZCameraPermissionState.Granted -> onPermissionEvent(
+                                    ZScannerPermissionEvent.Granted
+                                )
+
+                                ZCameraPermissionState.Denied -> onPermissionEvent(
+                                    ZScannerPermissionEvent.Denied
+                                )
+
+                                ZCameraPermissionState.DeniedAlways -> onPermissionEvent(
+                                    ZScannerPermissionEvent.DeniedAlways
+                                )
+
                                 ZCameraPermissionState.NotDetermined -> Unit
                             }
                         }

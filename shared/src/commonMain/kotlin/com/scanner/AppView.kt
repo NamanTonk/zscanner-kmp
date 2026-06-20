@@ -64,7 +64,7 @@ fun MainScreen(
             .windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Vertical))
             .imePadding()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

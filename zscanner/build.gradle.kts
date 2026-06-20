@@ -54,8 +54,6 @@ kotlin {
                 implementation(libs.ui.backhandler)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.moko.permission)
-                implementation(libs.moko.permission.camera)
                 implementation(libs.compose.uiToolingPreview)
             }
         }

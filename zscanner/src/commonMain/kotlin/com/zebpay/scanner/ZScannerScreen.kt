@@ -71,7 +71,21 @@ fun ZScannerScreen(
                     onResult = onResult,
                     modifier = modifier.fillMaxSize(),
                     frameSpec = frameSpec,
-                    onScanFromGallery = onScanFromGallery,
+                    onScanFromGallery = {
+                        scope.launch {
+                            val galleryState = permissionController.currentGalleryState()
+                            if (galleryState == ZCameraPermissionState.Granted) {
+                                onScanFromGallery()
+                            } else {
+                                val newState = permissionController.requestGalleryPermission()
+                                if (newState == ZCameraPermissionState.Granted) {
+                                    onScanFromGallery()
+                                } else if (newState == ZCameraPermissionState.DeniedAlways) {
+                                    permissionController.openAppSettings()
+                                }
+                            }
+                        }
+                    },
                     content = camera,
                 )
             }

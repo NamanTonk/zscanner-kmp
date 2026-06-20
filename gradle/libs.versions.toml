@@ -49,9 +49,7 @@ ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.r
 # Coroutines
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
 
-# Moko Permissions
-moko-permission = { module = "dev.icerock.moko:permissions-compose", version = "0.20.1" }
-moko-permission-camera = { module = "dev.icerock.moko:permissions-camera", version = "0.20.1" }
+
 
 # AndroidX Camera
 androidx-camera-core = { module = "androidx.camera:camera-core", version = "1.6.1" }

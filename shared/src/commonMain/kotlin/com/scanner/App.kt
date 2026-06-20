@@ -21,22 +21,34 @@ import com.zebpay.scanner.BarcodeResult
 import com.zebpay.scanner.ZScannerCameraMode
 import com.zebpay.scanner.ZScannerScreen
 import com.zebpay.scanner.ZScannerFrameRatio
-import com.zebpay.scanner.permission.rememberMokoCameraPermissionController
+import com.zebpay.scanner.permission.rememberZScannerPermissionController
 import com.zebpay.scanner.rememberZScannerController
 import com.zebpay.scanner.ui.defaults.ScanFrameOverlay
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.Image
+import com.zebpay.scanner.ZImageBarcodeScanner
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        val permissionController = rememberMokoCameraPermissionController()
+        val permissionController = rememberZScannerPermissionController()
         var showScanner by remember { mutableStateOf(false) }
         var scanResultText by remember { mutableStateOf("") }
         var scanStatusText by remember { mutableStateOf("No active scans") }
+        val imagePicker = rememberImagePicker { bytes ->
+            ZImageBarcodeScanner.scanQrCode(bytes) { result ->
+                if (result != null) {
+                    scanResultText = result
+                    scanStatusText = "Scan successful (Gallery)"
+                } else {
+                    scanStatusText = "No QR code found in selected image"
+                }
+                showScanner = false
+            }
+        }
         var selectedRatio by remember { mutableStateOf<ZScannerFrameRatio>(ZScannerFrameRatio.Ratio_1_1) }
         var selectedColor by remember { mutableStateOf(Color(0xFF4CAF50)) }
 
@@ -69,22 +81,35 @@ fun App() {
                         showScanner = false
                     },
                     camera = {
-                           ScanFrameOverlay()
-
+                        ScanFrameOverlay()
                         if (torchAvailable) {
                             IconButton(
                                 onClick = ::toggleTorch,
-                                modifier = Modifier.align(Alignment.BottomStart).padding(24.dp)
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(24.dp)
+                                    .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(50))
                             ) {
-                                Icon(if (torchEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff, null)
+                                Icon(
+                                    imageVector = if (torchEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff,
+                                    contentDescription = "Toggle Flash",
+                                    tint = Color.Black
+                                )
                             }
                         }
                         // Render a gallery button
                         IconButton(
                             onClick = { onScanFromGallery() }, // Call the callback
-                            modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(24.dp)
+                                .background(Color.White.copy(alpha = 0.4f), RoundedCornerShape(50))
                         ) {
-                            Icon(Icons.Default.Image, contentDescription = "Scan from Gallery")
+                            Icon(
+                                imageVector = Icons.Default.Image,
+                                contentDescription = "Scan from Gallery",
+                                tint = Color.Black
+                            )
                         }
                     },
                     scannerController = rememberZScannerController(
@@ -93,7 +118,10 @@ fun App() {
                         frameColor = selectedColor
                     ),
                     permissionController = permissionController,
-                    modifier = Modifier.fillMaxSize()
+                    onScanFromGallery = { imagePicker() },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding()
                 )
             } else {
                 Column(

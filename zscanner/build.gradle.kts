@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidLint)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeMultiplatform)
+    id("maven-publish")
 }
 
 kotlin {
@@ -78,4 +79,20 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.zscanner.generated.resources"
     generateResClass = ResourceClassGeneration.Always
+}
+
+group = "com.github.namantonk"
+version = "1.0.0"
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/namantonk/Scanner")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
+            }
+        }
+    }
 }

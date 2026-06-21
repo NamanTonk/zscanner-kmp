@@ -43,6 +43,7 @@ fun ZScannerScreen(
         cameraMode = ZScannerCameraMode.FullScreen
     ),
     onScanFromGallery: () -> Unit = {},
+    loader: @Composable ZScannerCameraScope.() -> Unit = { DefaultLoader() },
 ) {
     val scope = rememberCoroutineScope()
     var permissionState by remember { mutableStateOf(ZCameraPermissionState.NotDetermined) }
@@ -86,6 +87,7 @@ fun ZScannerScreen(
                             }
                         }
                     },
+                    loader = loader,
                     content = camera,
                 )
             }

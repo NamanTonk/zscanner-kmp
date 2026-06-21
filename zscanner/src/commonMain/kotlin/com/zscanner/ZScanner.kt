@@ -37,6 +37,10 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.foundation.border
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.zscanner.frame.ScanFrameSpec
@@ -56,6 +60,7 @@ fun ZScanner(
     modifier: Modifier = Modifier,
     frameSpec: ScanFrameSpec = ScanFrameSpec.Default,
     onScanFromGallery: () -> Unit = {},
+    loader: @Composable ZScannerCameraScope.() -> Unit = { DefaultLoader() },
     content: @Composable ZScannerCameraScope.() -> Unit,
 ) {
     var lastScanAt by remember { mutableLongStateOf(0L) }
@@ -87,6 +92,7 @@ fun ZScanner(
         frameSpec = frameSpec,
         onBarcodeDetected = ::handleBarcode,
         onScanFromGallery = onScanFromGallery,
+        loader = loader,
         content = content,
     )
 }
@@ -98,6 +104,7 @@ internal fun ZScannerCameraHost(
     frameSpec: ScanFrameSpec = ScanFrameSpec.Default,
     onBarcodeDetected: (Barcode) -> Unit,
     onScanFromGallery: () -> Unit = {},
+    loader: @Composable ZScannerCameraScope.() -> Unit = { DefaultLoader() },
     content: @Composable ZScannerCameraScope.() -> Unit,
 ) {
     val density = LocalDensity.current
@@ -171,36 +178,8 @@ internal fun ZScannerCameraHost(
         }
 
         if (controller.isProcessing) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color.DarkGray.copy(alpha = 0.9f),
-                    contentColor = Color.White
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = Color.White,
-                            strokeWidth = 3.dp,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Processing...",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
+            ProvideZScannerCameraScope(scope) {
+                scope.loader()
             }
         }
     }
@@ -216,6 +195,54 @@ private fun FrameOnlyScrim(
             frameBounds = frameBounds,
             cornerRadiusPx = cornerRadiusPx,
             scrimColor = Color.Black,
+        )
+    }
+}
+
+@Composable
+internal fun ZScannerCameraScope.DefaultLoader(
+    modifier: Modifier = Modifier,
+) {
+    val density = LocalDensity.current
+    val cornerRadius = frameSpec.effectiveCornerRadiusPx(frameBounds, density)
+    val shape = RoundedCornerShape(with(density) { cornerRadius.toDp() })
+    Box(
+        modifier = modifier
+            .offset {
+                IntOffset(frameBounds.left.roundToInt(), frameBounds.top.roundToInt())
+            }
+            .size(
+                width = with(density) { frameBounds.width.toDp() },
+                height = with(density) { frameBounds.height.toDp() },
+            )
+            .clip(shape)
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            color = controller.frameColor,
+            strokeWidth = 3.dp,
+            trackColor = Color.White.copy(alpha = 0.1f),
+            strokeCap = StrokeCap.Round,
+            modifier = Modifier
+                .size(48.dp)
+                .drawBehind {
+                    val radius = size.minDimension / 2f
+                    val glowRadius = radius + 12.dp.toPx()
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                controller.frameColor.copy(alpha = 0.45f),
+                                controller.frameColor.copy(alpha = 0.18f),
+                                Color.Transparent
+                            ),
+                            center = center,
+                            radius = glowRadius
+                        ),
+                        radius = glowRadius,
+                        center = center
+                    )
+                }
         )
     }
 }

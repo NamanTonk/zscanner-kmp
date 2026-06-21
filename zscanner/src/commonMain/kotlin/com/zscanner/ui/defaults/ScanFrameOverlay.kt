@@ -34,7 +34,7 @@ fun ZScannerCameraScope.ScanFrameOverlay(
     mode: ZScannerCameraMode = cameraMode,
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
     borderColor: Color = controller.frameColor,
-    borderWidth: Dp = 3.dp,
+    borderWidth: Dp = 5.dp,
     innerBorderColor: Color? = null,
     innerBorderWidth: Dp = 2.dp,
 ) {

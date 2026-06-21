@@ -30,6 +30,62 @@
 
 ## 🚀 Getting Started
 
+## 📦 Installation
+
+To use `zscanner` in your Compose Multiplatform project, choose one of the following integration methods:
+
+### Option A: JitPack (Recommended for public/anonymous use)
+JitPack allows you to include the library anonymously without needing a GitHub Personal Access Token.
+
+1. **Add Repository**: In the client project's `settings.gradle.kts` (under `dependencyResolutionManagement > repositories`), add JitPack:
+   ```kotlin
+   dependencyResolutionManagement {
+       repositories {
+           google()
+           mavenCentral()
+           maven { url = uri("https://jitpack.io") }
+       }
+   }
+   ```
+2. **Add Dependency**: In the client project's common module `build.gradle.kts` (usually `shared/build.gradle.kts` or `composeApp/build.gradle.kts`), add:
+   ```kotlin
+   sourceSets {
+       commonMain.dependencies {
+           implementation("com.github.NamanTonk:zscanner-kmp:1.0.0")
+       }
+   }
+   ```
+
+### Option B: GitHub Packages
+GitHub Packages requires authentication even for public packages.
+
+1. **Add Repository**: In the client project's `settings.gradle.kts` (under `dependencyResolutionManagement > repositories`), add the repository:
+   ```kotlin
+   dependencyResolutionManagement {
+       repositories {
+           google()
+           mavenCentral()
+           maven {
+               url = uri("https://maven.pkg.github.com/NamanTonk/zscanner-kmp")
+               credentials {
+                   username = "YOUR_GITHUB_USERNAME"
+                   password = "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN" // Needs 'read:packages' permission
+               }
+           }
+       }
+   }
+   ```
+2. **Add Dependency**: In the client project's common module `build.gradle.kts` (usually `shared/build.gradle.kts` or `composeApp/build.gradle.kts`), add:
+   ```kotlin
+   sourceSets {
+       commonMain.dependencies {
+           implementation("com.github.namantonk:zscanner:1.0.0")
+       }
+   }
+   ```
+
+---
+
 ### Customizing the Loader (Example)
 
 To override the default spinner with a custom loading indicator, simply pass your composable to the `loader` parameter in `ZScannerScreen`:

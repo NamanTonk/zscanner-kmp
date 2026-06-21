@@ -1,4 +1,4 @@
-name: Publish Library to GitHub Packages
+name: Publish Library to Maven Central
 
 on:
   push:
@@ -21,7 +21,10 @@ jobs:
       - name: Gradle Cache
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Publish all KMP targets to GitHub Packages
+      - name: Publish and sign KMP targets to Maven Central
         run: ./gradlew :zscanner:publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}

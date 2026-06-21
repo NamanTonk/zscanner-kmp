@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeMultiplatform)
     id("maven-publish")
+    id("signing")
 }
 
 kotlin {
@@ -85,14 +86,50 @@ group = "com.github.namantonk"
 version = "1.0.0"
 
 publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/NamanTonk/zscanner-kmp")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
+    publications.withType<MavenPublication> {
+        pom {
+            name.set("ZScanner")
+            description.set("Kotlin Multiplatform Barcode Scanner Library")
+            url.set("https://github.com/NamanTonk/zscanner-kmp")
+            licenses {
+                license {
+                    name.set("The Apache License, Version 2.0")
+                    url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                }
+            }
+            developers {
+                developer {
+                    id.set("namantonk")
+                    name.set("Naman Tonk")
+                    email.set("namantonk@gmail.com")
+                }
+            }
+            scm {
+                connection.set("scm:git:git://github.com/NamanTonk/zscanner-kmp.git")
+                developerConnection.set("scm:git:ssh://github.com/NamanTonk/zscanner-kmp.git")
+                url.set("https://github.com/NamanTonk/zscanner-kmp")
             }
         }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+            credentials {
+                username = System.getenv("OSSRH_USERNAME") ?: project.findProperty("ossrhUsername") as String?
+                password = System.getenv("OSSRH_PASSWORD") ?: project.findProperty("ossrhPassword") as String?
+            }
+        }
+    }
+}
+
+signing {
+    val signingKey = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
+    val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: project.findProperty("signing.password") as String?
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications)
     }
 }

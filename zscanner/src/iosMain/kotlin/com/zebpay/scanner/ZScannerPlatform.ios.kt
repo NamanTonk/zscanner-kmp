@@ -1,3 +1,3 @@
 package com.zebpay.scanner
 
-internal actual fun iosUsesWindowedCameraHost(): Boolean = true
+internal actual fun iosUsesWindowedCameraHost(): Boolean = false

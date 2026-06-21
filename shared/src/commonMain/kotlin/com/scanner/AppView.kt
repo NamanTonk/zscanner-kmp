@@ -339,7 +339,7 @@ fun ZScannerScreenLayout(
             onIntent(AppIntent.StopScanning)
         },
         scannerController = rememberZScannerController(
-            cameraMode = ZScannerCameraMode.FrameOnly,
+            cameraMode = ZScannerCameraMode.FullScreen,
             frameRatio = state.selectedRatio,
             frameColor = state.selectedColor
         ),

@@ -2,7 +2,7 @@ package com.scanner
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.zebpay.scanner.ZScannerFrameRatio
+import com.zscanner.ZScannerFrameRatio
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

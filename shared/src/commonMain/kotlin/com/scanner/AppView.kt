@@ -20,9 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zebpay.scanner.*
-import com.zebpay.scanner.permission.ZScannerPermissionController
-import com.zebpay.scanner.ui.defaults.ScanFrameOverlay
+import com.zscanner.*
+import com.zscanner.permission.ZScannerPermissionController
+import com.zscanner.ui.defaults.ScanFrameOverlay
 
 @Composable
 fun AppContent(

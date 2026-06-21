@@ -15,7 +15,7 @@ kotlin {
     }
 
     android {
-        namespace = "com.zebpay.scanner"
+        namespace = "com.zscanner"
         minSdk = libs.versions.android.minSdk.get().toInt()
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         androidResources {
@@ -76,6 +76,6 @@ kotlin {
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "com.zebpay.scanner.generated.resources"
+    packageOfResClass = "com.zscanner.generated.resources"
     generateResClass = ResourceClassGeneration.Always
 }

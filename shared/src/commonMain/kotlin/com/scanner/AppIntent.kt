@@ -1,7 +1,7 @@
 package com.scanner
 
 import androidx.compose.ui.graphics.Color
-import com.zebpay.scanner.ZScannerFrameRatio
+import com.zscanner.ZScannerFrameRatio
 
 sealed interface AppIntent {
     object StartScanning : AppIntent

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.zebpay.scanner.ZImageBarcodeScanner
-import com.zebpay.scanner.permission.rememberZScannerPermissionController
+import com.zscanner.ZImageBarcodeScanner
+import com.zscanner.permission.rememberZScannerPermissionController
 
 @Composable
 fun App() {

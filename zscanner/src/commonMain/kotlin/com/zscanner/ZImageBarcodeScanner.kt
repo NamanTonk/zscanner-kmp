@@ -6,6 +6,7 @@ package com.zscanner
 expect object ZImageBarcodeScanner {
     fun scanQrCode(
         imageData: ByteArray,
+        controller: ZScannerController? = null,
         onResult: (String?) -> Unit,
     )
 }

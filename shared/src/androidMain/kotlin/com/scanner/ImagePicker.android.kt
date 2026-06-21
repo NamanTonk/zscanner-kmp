@@ -4,11 +4,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
 actual fun rememberImagePicker(onImagePicked: (ByteArray) -> Unit): () -> Unit {
     val context = LocalContext.current
+    val currentOnImagePicked = rememberUpdatedState(onImagePicked)
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -18,7 +20,7 @@ actual fun rememberImagePicker(onImagePicked: (ByteArray) -> Unit): () -> Unit {
                 val bytes = inputStream?.readBytes()
                 inputStream?.close()
                 if (bytes != null) {
-                    onImagePicked(bytes)
+                    currentOnImagePicked.value(bytes)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

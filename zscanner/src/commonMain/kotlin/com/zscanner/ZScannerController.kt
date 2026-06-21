@@ -48,6 +48,8 @@ class ZScannerController internal constructor(
     var isPaused by mutableStateOf(false)
         private set
 
+    var isProcessing by mutableStateOf(false)
+
     internal var frameBounds: ScanFrameBounds? = null
 
     internal fun updateTorchState(enabled: Boolean, available: Boolean) {

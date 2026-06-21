@@ -4,6 +4,7 @@ package com.scanner
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import platform.UIKit.*
 import platform.Foundation.*
 import platform.posix.memcpy
@@ -12,6 +13,7 @@ import kotlinx.cinterop.*
 
 @Composable
 actual fun rememberImagePicker(onImagePicked: (ByteArray) -> Unit): () -> Unit {
+    val currentOnImagePicked = rememberUpdatedState(onImagePicked)
     val delegate = remember {
         object : NSObject(), UIImagePickerControllerDelegateProtocol, UINavigationControllerDelegateProtocol {
             override fun imagePickerController(
@@ -31,7 +33,7 @@ actual fun rememberImagePicker(onImagePicked: (ByteArray) -> Unit): () -> Unit {
                                 pinned.unpin()
                             }
                         }
-                        onImagePicked(bytes)
+                        currentOnImagePicked.value(bytes)
                     }
                 }
                 picker.dismissViewControllerAnimated(true, null)

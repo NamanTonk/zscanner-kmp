@@ -31,23 +31,33 @@ import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import platform.Foundation.timeIntervalSince1970
 
 actual object ZImageBarcodeScanner {
 
     actual fun scanQrCode(
         imageData: ByteArray,
+        controller: ZScannerController?,
         onResult: (String?) -> Unit,
     ) {
         if (imageData.isEmpty()) {
-            deliver(onResult, null)
+            controller?.isProcessing = false
+            onResult(null)
             return
         }
+
+        controller?.isProcessing = true
+        val startTime = platform.Foundation.NSDate().timeIntervalSince1970 * 1000
 
         val data = imageData.toNSData()
         val workQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)
         dispatch_async(workQueue) {
             val payload = scanWithVision(data) ?: scanWithCiDetector(data)
-            deliver(onResult, payload)
+            deliverWithDelay(controller, startTime.toLong(), payload, onResult)
         }
     }
 
@@ -98,8 +108,20 @@ actual object ZImageBarcodeScanner {
         return rendered?.CGImage
     }
 
-    private fun deliver(onResult: (String?) -> Unit, value: String?) {
-        dispatch_async(dispatch_get_main_queue()) {
+    private fun deliverWithDelay(
+        controller: ZScannerController?,
+        startTime: Long,
+        value: String?,
+        onResult: (String?) -> Unit
+    ) {
+        val now = (platform.Foundation.NSDate().timeIntervalSince1970 * 1000).toLong()
+        val elapsed = now - startTime
+        val remainingDelay = 1000 - elapsed
+        CoroutineScope(Dispatchers.Main).launch {
+            if (remainingDelay > 0) {
+                delay(remainingDelay)
+            }
+            controller?.isProcessing = false
             onResult(value)
         }
     }

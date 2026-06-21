@@ -287,10 +287,50 @@ fun MainScreen(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .padding(bottom = 32.dp)
+                    .padding(bottom = 24.dp)
             )
         } else {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // Camera Mode Selection
+        Text(
+            text = "Camera Mode",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp)
+        ) {
+            val modes = listOf(
+                ZScannerCameraMode.FullScreen to "Full Screen",
+                ZScannerCameraMode.FrameOnly to "Frame Only"
+            )
+            modes.forEach { (mode, label) ->
+                val isSelected = state.selectedCameraMode == mode
+                OutlinedButton(
+                    onClick = {
+                        onIntent(AppIntent.SelectCameraMode(mode))
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                    ),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(label)
+                }
+            }
         }
 
         // Scan Trigger Button
@@ -339,7 +379,7 @@ fun ZScannerScreenLayout(
             onIntent(AppIntent.StopScanning)
         },
         scannerController = rememberZScannerController(
-            cameraMode = ZScannerCameraMode.FullScreen,
+            cameraMode = state.selectedCameraMode,
             frameRatio = state.selectedRatio,
             frameColor = state.selectedColor
         ),

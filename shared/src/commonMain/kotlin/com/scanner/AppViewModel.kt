@@ -3,6 +3,7 @@ package com.scanner
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.zscanner.ZScannerFrameRatio
+import com.zscanner.ZScannerCameraMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -115,6 +116,11 @@ class AppViewModel : ViewModel() {
                             showScanner = false
                         )
                     }
+                }
+            }
+            is AppIntent.SelectCameraMode -> {
+                _state.update {
+                    it.copy(selectedCameraMode = intent.mode)
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.scanner
 
 import androidx.compose.ui.graphics.Color
 import com.zscanner.ZScannerFrameRatio
+import com.zscanner.ZScannerCameraMode
 
 sealed interface AppIntent {
     object StartScanning : AppIntent
@@ -16,4 +17,5 @@ sealed interface AppIntent {
     data class ToggleCustomRatioMode(val enabled: Boolean) : AppIntent
     data class ToggleCustomColorMode(val enabled: Boolean) : AppIntent
     data class ScanImageResult(val qrCode: String?) : AppIntent
+    data class SelectCameraMode(val mode: ZScannerCameraMode) : AppIntent
 }

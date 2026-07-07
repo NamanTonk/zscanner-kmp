@@ -1,3 +1,4 @@
+import java.util.Base64
 import org.jetbrains.compose.resources.ResourcesExtension.ResourceClassGeneration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -126,9 +127,15 @@ publishing {
 }
 
 signing {
-    val signingKey = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
+    val signingKeyBase64 = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
     val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: project.findProperty("signing.password") as String?
-    if (signingKey != null && signingPassword != null) {
+    if (signingKeyBase64 != null && signingPassword != null) {
+        val signingKey = try {
+            val cleanedKey = signingKeyBase64.trim().replace("\\s".toRegex(), "")
+            String(Base64.getDecoder().decode(cleanedKey))
+        } catch (e: Exception) {
+            signingKeyBase64 // Fallback if it's already plain text
+        }
         useInMemoryPgpKeys(signingKey, signingPassword)
         sign(publishing.publications)
     }

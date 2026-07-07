@@ -86,8 +86,14 @@ compose.resources {
 group = "com.github.namantonk"
 version = "1.0.0"
 
+val emptyJavadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+    destinationDirectory.set(layout.buildDirectory.dir("emptyJavadoc"))
+}
+
 publishing {
     publications.withType<MavenPublication> {
+        artifact(emptyJavadocJar)
         pom {
             name.set("ZScanner")
             description.set("Kotlin Multiplatform Barcode Scanner Library")

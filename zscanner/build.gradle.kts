@@ -114,14 +114,8 @@ publishing {
     }
     repositories {
         maven {
-            name = "OSSRH"
-            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
-            credentials {
-                username = System.getenv("OSSRH_USERNAME") ?: project.findProperty("ossrhUsername") as String?
-                password = System.getenv("OSSRH_PASSWORD") ?: project.findProperty("ossrhPassword") as String?
-            }
+            name = "LocalDirectory"
+            url = uri(layout.buildDirectory.dir("repo"))
         }
     }
 }

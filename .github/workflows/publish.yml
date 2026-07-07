@@ -21,10 +21,21 @@ jobs:
       - name: Gradle Cache
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Publish and sign KMP targets to Maven Central
+      - name: Publish and sign KMP targets to local directory
         run: ./gradlew :zscanner:publish
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}
+
+      - name: Zip deployment bundle
+        run: |
+          cd zscanner/build/repo
+          zip -r ../bundle.zip *
+
+      - name: Upload bundle to Sonatype Central Portal
+        run: |
+          AUTH=$(echo -n "${{ secrets.OSSRH_USERNAME }}:${{ secrets.OSSRH_PASSWORD }}" | base64 | tr -d '\n')
+          curl -s --fail-with-body -X POST \
+            -H "Authorization: Bearer $AUTH" \
+            -F "bundle=@zscanner/build/bundle.zip" \
+            "https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC"

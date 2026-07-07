@@ -38,7 +38,7 @@ To use `zscanner` in your Compose Multiplatform project, add the dependency to y
 sourceSets {
     commonMain.dependencies {
         // Core KMP scanner library from Maven Central
-        implementation("com.github.namantonk:zscanner:1.0.0")
+        implementation("io.github.namantonk:zscanner:1.0.0")
     }
 }
 ```

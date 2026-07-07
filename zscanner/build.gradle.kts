@@ -83,7 +83,7 @@ compose.resources {
     generateResClass = ResourceClassGeneration.Always
 }
 
-group = "com.github.namantonk"
+group = "io.github.namantonk"
 version = "1.0.0"
 
 val emptyJavadocJar by tasks.registering(Jar::class) {
@@ -127,31 +127,27 @@ publishing {
 }
 
 signing {
-    val signingKeyBase64 = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
-    val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: project.findProperty("signing.password") as String?
-    
-    if (signingKeyBase64 != null || signingPassword != null) {
-        if (signingKeyBase64.isNullOrBlank()) {
-            logger.error("GPG_SIGNING_KEY is null or blank!")
+    val isPublishing = gradle.startParameter.taskNames.any { it.contains("publish") }
+    if (isPublishing) {
+        val signingKeyBase64 = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
+        val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: project.findProperty("signing.password") as String?
+
+        if (signingKeyBase64.isNullOrBlank() || signingPassword.isNullOrBlank()) {
+            throw GradleException("GPG_SIGNING_KEY and GPG_SIGNING_PASSWORD must be provided as GitHub Secrets to publish!")
         }
-        if (signingPassword.isNullOrBlank()) {
-            logger.error("GPG_SIGNING_PASSWORD is null or blank!")
+
+        val signingKey = try {
+            val cleanedKey = signingKeyBase64.trim().replace("\\s".toRegex(), "")
+            String(Base64.getDecoder().decode(cleanedKey))
+        } catch (e: Exception) {
+            signingKeyBase64 // Fallback if already plain text
         }
-        
-        if (!signingKeyBase64.isNullOrBlank() && !signingPassword.isNullOrBlank()) {
-            val signingKey = try {
-                val cleanedKey = signingKeyBase64.trim().replace("\\s".toRegex(), "")
-                String(Base64.getDecoder().decode(cleanedKey))
-            } catch (e: Exception) {
-                signingKeyBase64 // Fallback if already plain text
-            }
-            
-            if (!signingKey.contains("-----BEGIN PGP PRIVATE KEY BLOCK-----")) {
-                logger.error("Parsed GPG key does not contain private key block header! Key length: ${signingKey.length}")
-            }
-            
-            useInMemoryPgpKeys(signingKey, signingPassword)
-            sign(publishing.publications)
+
+        if (!signingKey.contains("-----BEGIN PGP PRIVATE KEY BLOCK-----")) {
+            throw GradleException("Parsed GPG key does not contain private key block header! Check your GPG_SIGNING_KEY secret.")
         }
+
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications)
     }
 }

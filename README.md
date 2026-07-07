@@ -30,7 +30,47 @@
 
 ## 🚀 Getting Started
 
-## 📦 Installation
+### 1. Basic Usage
+
+Here is a standard integration of the scanner in a Composable function:
+
+```kotlin
+import androidx.compose.runtime.Composable
+import com.zscanner.ZScannerScreen
+import com.zscanner.BarcodeResult
+import com.zscanner.permission.rememberZScannerPermissionController
+
+@Composable
+fun BarcodeScannerScreen(
+    onNavigateBack: () -> Unit,
+    onBarcodeScanned: (String) -> Unit
+) {
+    // Initialize the permission controller
+    val permissionController = rememberZScannerPermissionController()
+
+    ZScannerScreen(
+        onResult = { result ->
+            when (result) {
+                is BarcodeResult.Success -> {
+                    onBarcodeScanned(result.barcode.data)
+                }
+                is BarcodeResult.Cancelled -> {
+                    onNavigateBack()
+                }
+                is BarcodeResult.Failed -> {
+                    // Handle failure (e.g., log error message: result.message)
+                }
+            }
+        },
+        onClose = {
+            onNavigateBack()
+        },
+        permissionController = permissionController
+    )
+}
+```
+
+### 2. Installation
 
 To use `zscanner` in your Compose Multiplatform project, add the dependency to your common module's `build.gradle.kts` (usually `shared/build.gradle.kts` or `composeApp/build.gradle.kts`):
 
@@ -47,11 +87,64 @@ Make sure you have `mavenCentral()` in your repositories block in `settings.grad
 
 ---
 
-### Customizing the Loader (Example)
+### 3. Customizing the Controller & Gallery Scanning
+
+You can configure scanning parameters such as the active camera mode, scan frame ratio, overlay boundary color, and enable gallery barcode scanning.
+
+#### Example: Configuring the Controller and Gallery Picker Callback
+
+```kotlin
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import com.zscanner.ZScannerScreen
+import com.zscanner.BarcodeResult
+import com.zscanner.ZScannerCameraMode
+import com.zscanner.ZScannerFrameRatio
+import com.zscanner.rememberZScannerController
+import com.zscanner.permission.rememberZScannerPermissionController
+
+@Composable
+fun AdvancedScannerScreen(
+    onNavigateBack: () -> Unit,
+    onBarcodeScanned: (String) -> Unit,
+    onLaunchGalleryPicker: () -> Unit // Callback to launch system photo picker
+) {
+    val permissionController = rememberZScannerPermissionController()
+
+    // 1. Customize your controller properties
+    val scannerController = rememberZScannerController(
+        cameraMode = ZScannerCameraMode.FrameOnly,      // Use windowed scanner frame instead of full-screen
+        frameRatio = ZScannerFrameRatio.Ratio_1_1,      // Set scanning frame to 1:1 aspect ratio
+        frameColor = Color(0xFF2196F3),                 // Custom scanner border outline color (Blue)
+        showTorchButton = true,                         // Enable/disable flash toggle button
+        showGalleryButton = true                        // Enable/disable gallery entry point button
+    )
+
+    ZScannerScreen(
+        onResult = { result ->
+            if (result is BarcodeResult.Success) {
+                onBarcodeScanned(result.barcode.data)
+            }
+        },
+        onClose = onNavigateBack,
+        permissionController = permissionController,
+        scannerController = scannerController,
+        // 2. Callback executed when the user clicks the gallery button on the overlay
+        onScanFromGallery = onLaunchGalleryPicker
+    )
+}
+```
+
+### 4. Customizing the Loader (Example)
 
 To override the default spinner with a custom loading indicator, simply pass your composable to the `loader` parameter in `ZScannerScreen`:
 
 ```kotlin
+import com.zscanner.permission.rememberZScannerPermissionController
+
+// Inside your Composable function:
+val permissionController = rememberZScannerPermissionController()
+
 ZScannerScreen(
     onResult = { result -> /* handle result */ },
     onClose = { /* handle close */ },

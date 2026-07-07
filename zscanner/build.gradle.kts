@@ -129,14 +129,29 @@ publishing {
 signing {
     val signingKeyBase64 = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
     val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: project.findProperty("signing.password") as String?
-    if (signingKeyBase64 != null && signingPassword != null) {
-        val signingKey = try {
-            val cleanedKey = signingKeyBase64.trim().replace("\\s".toRegex(), "")
-            String(Base64.getDecoder().decode(cleanedKey))
-        } catch (e: Exception) {
-            signingKeyBase64 // Fallback if it's already plain text
+    
+    if (signingKeyBase64 != null || signingPassword != null) {
+        if (signingKeyBase64.isNullOrBlank()) {
+            logger.error("GPG_SIGNING_KEY is null or blank!")
         }
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications)
+        if (signingPassword.isNullOrBlank()) {
+            logger.error("GPG_SIGNING_PASSWORD is null or blank!")
+        }
+        
+        if (!signingKeyBase64.isNullOrBlank() && !signingPassword.isNullOrBlank()) {
+            val signingKey = try {
+                val cleanedKey = signingKeyBase64.trim().replace("\\s".toRegex(), "")
+                String(Base64.getDecoder().decode(cleanedKey))
+            } catch (e: Exception) {
+                signingKeyBase64 // Fallback if already plain text
+            }
+            
+            if (!signingKey.contains("-----BEGIN PGP PRIVATE KEY BLOCK-----")) {
+                logger.error("Parsed GPG key does not contain private key block header! Key length: ${signingKey.length}")
+            }
+            
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            sign(publishing.publications)
+        }
     }
 }

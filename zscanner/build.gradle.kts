@@ -17,7 +17,7 @@ kotlin {
     }
 
     android {
-        namespace = "com.zscanner"
+        namespace = "io.github.namantonk"
         minSdk = libs.versions.android.minSdk.get().toInt()
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         androidResources {
@@ -28,7 +28,7 @@ kotlin {
         }
     }
 
-    val xcfName = "zscannerKit"
+    val xcfName = "zscanner"
 
     iosArm64 {
         binaries.framework {

@@ -33,8 +33,15 @@ jobs:
           zip -r ../bundle.zip *
 
       - name: Upload bundle to Sonatype Central Portal
+        env:
+          USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
         run: |
-          AUTH=$(echo -n "${{ secrets.OSSRH_USERNAME }}:${{ secrets.OSSRH_PASSWORD }}" | base64 | tr -d '\n')
+          if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+            echo "Error: OSSRH_USERNAME or OSSRH_PASSWORD secret is empty!"
+            exit 1
+          fi
+          AUTH=$(echo -n "$USERNAME:$PASSWORD" | base64 | tr -d '\n')
           curl -s --fail-with-body -X POST \
             -H "Authorization: Bearer $AUTH" \
             -F "bundle=@zscanner/build/bundle.zip" \

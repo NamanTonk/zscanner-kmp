@@ -126,24 +126,22 @@ publishing {
 }
 
 signing {
-    val isPublishing = gradle.startParameter.taskNames.any { it.contains("publish") }
-    if (isPublishing) {
-        val signingKeyBase64 = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
-        val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: project.findProperty("signing.password") as String?
+    val isCI = System.getenv("CI") == "true" || System.getenv("GITHUB_ACTIONS") == "true"
+    val signingKeyBase64 = System.getenv("GPG_SIGNING_KEY") ?: project.findProperty("signing.key") as String?
+    val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: project.findProperty("signing.password") as String?
 
-        if (signingKeyBase64.isNullOrBlank() || signingPassword.isNullOrBlank()) {
-            throw GradleException("GPG_SIGNING_KEY and GPG_SIGNING_PASSWORD must be provided as GitHub Secrets to publish!")
-        }
+    val hasKeys = !signingKeyBase64.isNullOrBlank() && !signingPassword.isNullOrBlank()
 
+    if (isCI && !hasKeys) {
+        throw GradleException("GPG_SIGNING_KEY and GPG_SIGNING_PASSWORD must be provided as GitHub Secrets to publish in CI!")
+    }
+
+    if (hasKeys) {
         val signingKey = try {
-            val cleanedKey = signingKeyBase64.trim().replace("\\s".toRegex(), "")
+            val cleanedKey = signingKeyBase64!!.trim().replace("\\s".toRegex(), "")
             String(Base64.getDecoder().decode(cleanedKey))
         } catch (e: Exception) {
-            signingKeyBase64 // Fallback if already plain text
-        }
-
-        if (!signingKey.contains("-----BEGIN PGP PRIVATE KEY BLOCK-----")) {
-            throw GradleException("Parsed GPG key does not contain private key block header! Check your GPG_SIGNING_KEY secret.")
+            signingKeyBase64!!
         }
 
         useInMemoryPgpKeys(signingKey, signingPassword)

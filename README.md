@@ -6,9 +6,9 @@
 
 ## 📱 Demo / Preview
 
-| Android Preview |
-| :---: |
-| ![Android Demo](./docs/assets/android-demo.gif) |
+| Android Preview | iOS Preview |
+| :---: | :---: |
+| ![Android Demo](./docs/assets/android-demo.gif) | ![iOS Demo](./docs/assets/ios-demo.gif) |
 
 ---
 

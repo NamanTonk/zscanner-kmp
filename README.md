@@ -4,6 +4,14 @@
 
 ---
 
+## 📱 Demo / Preview
+
+| Android Preview |
+| :---: |
+| ![Android Demo](./docs/assets/android-demo.gif) |
+
+---
+
 ## 🌟 Key Features
 
 * **Dual Camera Modes**: Support for both `FullScreen` previews and `FrameOnly` windowed preview modes.
